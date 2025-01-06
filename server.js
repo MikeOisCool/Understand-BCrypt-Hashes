@@ -11,45 +11,66 @@ const someOtherPlaintextPassword = 'pass123';
 
 // Middleware für body parsing
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 //START_ASYNC -do not remove notes, place code between correct pair of notes.
 // Beispiel: Asynchrone Methode, um ein Passwort zu hashen
-app.post('/hash-password', async (req, res) => {
-    try {
-      // Passwort mit bcrypt hashen
-      const hashedPassword = await bcrypt.hash(myPlaintextPassword, saltRounds);
-      console.log('Hashed Password:', hashedPassword);
-      res.json({ hashedPassword });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error hashing password');
-    }
-  });
-  
-  // Beispiel: Asynchrone Methode, um ein Passwort zu vergleichen
-  app.post('/compare-password', async (req, res) => {
-    try {
-      // Vergleich des Klartextpassworts mit dem gehashten Passwort
-      const match = await bcrypt.compare(someOtherPlaintextPassword, myPlaintextPassword);
-      console.log('Do the passwords match?', match);
-      res.json({ match });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error comparing password');
-    }
-  });
+app.post('/async-hash', async (req, res) => {
+  try {
+    //Passwort hashen
+    const hashedPassword = await bcrypt.hash(myPlaintextPassword, saltRounds);
+    console.log('Asynchronous Hashed Password:', hashedPassword);
 
+    //Vergleich des korrekten Password
+    const matchCorrect = await bcrypt.compare(myPlaintextPassword, hashedPassword);
+    console.log('Does the correct password match? (Async):', matchCorrect); // true
 
+    // Vergleich des falschen Passworts
+    const matchIncorrect = await bcrypt.compare(someOtherPlaintextPassword, hashedPassword);
+    console.log('Does the incorrect password match? (Async):', matchIncorrect); // false
+
+    // Antwort an den Client senden
+    res.json({
+      hashedPassword,
+      matchCorrect,
+      matchIncorrect
+    });
+  } catch (err) {
+    console.error('Error during async operations:', err);
+    res.status(500).send('Error during async hasing or comparison');
+  }
+})
 //END_ASYNC
 
 //START_SYNC
+app.post('/sync-hash', (req, res) => {
+  try {
+    // Passwort sysnchron hashen
+      const hashedPassword = bcrypt.hashSync(myPlaintextPassword, saltRounds);
+      console.log('Synchronous Hashed Password:', hashedPassword)
 
-// Beispiel: Passwort synchron hashen
-const hashedPasswordSync = bcrypt.hashSync(myPlaintextPassword, saltRounds);
-console.log('Synchronous hashed password:', hashedPasswordSync);
+      //Vergleich des korrekten Passworts
+      const matchCorrect = bcrypt.compareSync(myPlaintextPassword, hashedPassword);
+      console.log('Does the incorrect password match? (Sync', matchCorrect); // true
 
-// Beispiel: Passwort synchron vergleichen
-const isMatchSync = bcrypt.compareSync(someOtherPlaintextPassword, myPlaintextPassword);
-console.log('Do the passwords match? (Sync)', isMatchSync);
+      // Vergleich des falschen Passworts
+      const matchIncorrect = bcrypt.compareSync(someOtherPlaintextPassword);
+      console.log('Does the incorrect password match? (Sync):', matchIncorrect);
+
+      // Antwort an den Client senden
+      res.json({
+        hashedPassword,
+        matchCorrect,
+        matchIncorrect
+       }); 
+  
+      
+  
+  } catch (err) { 
+    console.log('Error during sync operation:', err);
+    res.status(500).send('Error during sync hashing or comparison');
+  }
+});
+
 
 //END_SYNC
 
