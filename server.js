@@ -62,7 +62,7 @@ app.post('/sync-hash', (req, res) => {
       console.log('Does the incorrect password match? (Sync', matchCorrect); // true
 
       // Vergleich des falschen Passworts
-      const matchIncorrect = bcrypt.compareSync(someOtherPlaintextPassword);
+      const matchIncorrect = bcrypt.compareSync(someOtherPlaintextPassword, hashedPassword);
       console.log('Does the incorrect password match? (Sync):', matchIncorrect);
 
       // Antwort an den Client senden
