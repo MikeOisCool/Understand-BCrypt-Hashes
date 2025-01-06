@@ -65,6 +65,12 @@ app.post('/sync-hash', (req, res) => {
       const matchIncorrect = bcrypt.compareSync(someOtherPlaintextPassword, hashedPassword);
       console.log('Does the incorrect password match? (Sync):', matchIncorrect); // false
 
+      // Lösungsvorschlag freecodecamp
+      let hash = bcrypt.hashSync(myPlaintextPassword, saltRounds);
+      console.log(hash);
+      let result = bcrypt.compareSync(myPlaintextPassword, hash);
+      console.log(result);
+
       // Antwort an den Client senden
       res.json({
         hashedPassword,
