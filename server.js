@@ -75,7 +75,9 @@ app.post('/sync-hash', (req, res) => {
       res.json({
         hashedPassword,
         matchCorrect,
-        matchIncorrect
+        matchIncorrect,
+        hash,
+        result
        }); 
   
       
